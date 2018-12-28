@@ -1,3 +1,8 @@
+# By: Eyal Zakkay, 2018
+# Ported to Keras from the official Tensorflow implementation by Magenta
+
+""" Sketch-RNN Implementation in Keras - Training"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,106 +11,11 @@ import argparse
 import json
 import os
 import sys
-# import time
-import numpy as np
-# import requests
-# import six
-# from six.moves import cStringIO as StringIO
-# import copy
 
 from seq2seqVAE import Seq2seqModel, get_default_hparams
 from keras.callbacks import ModelCheckpoint
 from utils import load_dataset,batch_generator, KLWeightScheduler, LearningRateSchedulerPerBatch,\
     TensorBoardLR, DotDict, Logger
-
-from keras.models import Model
-
-
-# def load_dataset(data_dir, model_params):
-#     """Loads the .npz file, and splits the set into train/valid/test."""
-#
-#     #   normalizes the x and y columns using the training set.
-#     # applies same scaling factor to valid and test set.
-#
-#     if isinstance(model_params.data_set, list):
-#         datasets = model_params.data_set
-#     else:
-#         datasets = [model_params.data_set]
-#
-#     train_strokes = None
-#     valid_strokes = None
-#     test_strokes = None
-#
-#     for dataset in datasets:
-#         data_filepath = os.path.join(data_dir, dataset)
-#         if data_dir.startswith('http://') or data_dir.startswith('https://'):
-#             print('Downloading %s', data_filepath)
-#             response = requests.get(data_filepath)
-#             data = np.load(StringIO(response.content))
-#         else:
-#             if six.PY3:
-#                 data = np.load(data_filepath, encoding='latin1')
-#             else:
-#                 data = np.load(data_filepath)
-#         print('Loaded {}/{}/{} from {}'.format(
-#             len(data['train']), len(data['valid']), len(data['test']),
-#             dataset))
-#
-#         if train_strokes is None:
-#             train_strokes = data['train']
-#             valid_strokes = data['valid']
-#             test_strokes = data['test']
-#         else:
-#             train_strokes = np.concatenate((train_strokes, data['train']))
-#             valid_strokes = np.concatenate((valid_strokes, data['valid']))
-#             test_strokes = np.concatenate((test_strokes, data['test']))
-#
-#     all_strokes = np.concatenate((train_strokes, valid_strokes, test_strokes))
-#     num_points = 0
-#     for stroke in all_strokes:
-#         num_points += len(stroke)
-#     avg_len = num_points / len(all_strokes)
-#     print('Dataset combined: {} ({}/{}/{}), avg len {}'.format(
-#         len(all_strokes), len(train_strokes), len(valid_strokes),
-#         len(test_strokes), int(avg_len)))
-#
-#     # calculate the max strokes we need.
-#     max_seq_len = utils.get_max_len(all_strokes)
-#     # overwrite the hps with this calculation.
-#     model_params.max_seq_len = max_seq_len
-#
-#     print('model_params.max_seq_len %i.', model_params.max_seq_len)
-#
-#     train_set = utils.DataLoader(
-#         train_strokes,
-#         model_params.batch_size,
-#         max_seq_length=model_params.max_seq_len,
-#         random_scale_factor=model_params.random_scale_factor,
-#         augment_stroke_prob=model_params.augment_stroke_prob)
-#
-#     normalizing_scale_factor = train_set.calculate_normalizing_scale_factor()
-#     train_set.normalize(normalizing_scale_factor)
-#
-#     valid_set = utils.DataLoader(
-#         valid_strokes,
-#         model_params.batch_size,
-#         max_seq_length=model_params.max_seq_len,
-#         random_scale_factor=0.0,
-#         augment_stroke_prob=0.0)
-#     valid_set.normalize(normalizing_scale_factor)
-#
-#     test_set = utils.DataLoader(
-#         test_strokes,
-#         model_params.batch_size,
-#         max_seq_length=model_params.max_seq_len,
-#         random_scale_factor=0.0,
-#         augment_stroke_prob=0.0)
-#     test_set.normalize(normalizing_scale_factor)
-#
-#     print('normalizing_scale_factor %4.4f.', normalizing_scale_factor)
-#
-#     result = [train_set, valid_set, test_set, model_params]
-#     return result
 
 
 def get_callbacks_dict(seq2seq, model_params, experiment_path=''):
@@ -137,18 +47,17 @@ def get_callbacks_dict(seq2seq, model_params, experiment_path=''):
 
 
 def main(args, hparams):
-    # logger
+    """ Main function for Keras Sketch-RNN"""
+    # Logger:
     logsdir = os.path.join(args.experiment_dir, 'logs')
     os.makedirs(logsdir)
     os.makedirs(os.path.join(args.experiment_dir, 'checkpoints'))
     sys.stdout = Logger(logsdir)
 
-    # hparams = get_default_hparams()
-
-    # Add support fot dot access for auxiliary function use
+    # Add support for dot access for auxiliary function use:
     hparams_dot = DotDict(hparams)
 
-    # Load dataset
+    # Load dataset:
     hparams_dot.data_set = args.data_set
     datasets = load_dataset(args.data_dir, hparams_dot)
 
@@ -157,24 +66,25 @@ def main(args, hparams):
     test_set = datasets[2]
     model_params = datasets[3]
 
-    # Build and compile model
+    # Build and compile model:
     seq2seq = Seq2seqModel(model_params)
     seq2seq.compile()
     model = seq2seq.model
 
-    # Create a data generator
+    # Create a data generator:
     train_generator = batch_generator(train_set, train=True)
     val_generator = batch_generator(valid_set, train=False)
 
-    # Callbacks
+    # Callbacks:
     model_callbacks = get_callbacks_dict(seq2seq=seq2seq, model_params=model_params, experiment_path=args.experiment_dir)
 
-    # Load checkpoint
+    # Load checkpoint:
     if args.checkpoint is not None:
-        # load weights
+        # Load weights:
         seq2seq.load_trained_weights(args.checkpoint)
-        # initial batch (affects LR and KL weight decay)
-        count = args.initial_epoch*train_set.num_batches
+        # Initial batch (affects LR and KL weight decay):
+        num_batches = model_params.save_every if model_params.save_every is not None else train_set.num_batches
+        count = args.initial_epoch*num_batches
         model_callbacks['lr_schedule'].count = count
         model_callbacks['kl_weight_schedule'].count = count
 
@@ -183,17 +93,16 @@ def main(args, hparams):
         json.dump(model_params, f, indent=True)
 
     # Train
-    model.fit_generator(generator=train_generator, steps_per_epoch=train_set.num_batches, epochs=model_params.epochs,
+    steps_per_epoch = model_params.save_every if model_params.save_every is not None else train_set.num_batches
+    model.fit_generator(generator=train_generator, steps_per_epoch=steps_per_epoch, epochs=model_params.epochs,
                         validation_data=val_generator, validation_steps=valid_set.num_batches,
                         callbacks=[cbk for cbk in model_callbacks.values()],
                         initial_epoch=args.initial_epoch)
-    # Debug:
-    # model.fit_generator(generator=train_generator, steps_per_epoch=model_params.save_every, epochs=model_params.epochs,
-    #                     validation_data=val_generator, validation_steps=valid_set.num_batches, callbacks=model_callbacks)
 
 
 if __name__ == '__main__':
-    # Todo: make experiment path configurable
+
+    # Parse arguments and use defaults when needed
     hparams = get_default_hparams()
 
     parser = argparse.ArgumentParser(description='Main script for running sketch-rnn')
@@ -201,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', type=str,
                         default='datasets',
                         help='Path for data files (directory only). (default: %(default)s)')
-
+    # Todo: support use of multiple datasets using command line. currently only supported when editing default params
     parser.add_argument('--data_set', type=str,
                         default=hparams['data_set'],
                         help='Name of .npz file. (default: %(default)s)')
@@ -220,12 +129,19 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # get file name of .npz file
-    data_set = os.path.splitext(args.data_set)[0]
-    experiment_path = os.path.join(args.experiment_dir, "{}\\exp".format(data_set))
-    args.data_set = data_set+'.npz'
+    # Get file name of .npz file
+    # Todo: support use of multiple datasets using command line. currently only supported when editing default params
+    if isinstance(args.data_set, list):  # more than one dataset
+        sets = [os.path.splitext(s)[0] for s in args.data_set]
+        experiment_path = os.path.join(args.experiment_dir, "{}\\exp".format('_'.join(sets)))
+        args.data_set = [s+'.npz' for s in sets]
+    else:
+        data_set = os.path.splitext(args.data_set)[0]
+        experiment_path = os.path.join(args.experiment_dir, "{}\\exp".format(data_set))
+        args.data_set = data_set+'.npz'
 
     # Create a unique experiment folder
+    # Todo: make this generic for operating systems other than windows path syntax
     dir_counter = 0
     new_experiment_path = experiment_path
     while os.path.exists(new_experiment_path):
