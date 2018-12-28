@@ -40,7 +40,8 @@ To train a model, you need a dataset in the appropriate format. You can download
 Currently, configurable hyperparameters can only be modified by changing their default values in `seq2seqVAE.py`.  
 I might add an option to configure them via command line in the future.
 
-You can also resume the training from a saved checkpoint by supplying the `--checkpoint=[file path]` and a `--initial_epoch=[epoch from which you are restarting]` arguments
+You can also resume the training from a saved checkpoint by supplying the `--checkpoint=[file path]` and a `--initial_epoch=[epoch from which you are restarting]` arguments.  
+
 The full list of configurable parameters:
 ```python
         # Experiment Params:
@@ -73,3 +74,6 @@ The full list of configurable parameters:
 ```
 
 ### Using a trained model to draw
+In the notebook `Skecth_RNN_Keras.ipynb` you can supply a path to a trained model and a dataset and explore what the model has learned.
+There are examples of encoding and decoding of sketches, interpulating in latent space, demonstrating sampling under different `temperature` values etc.
+
