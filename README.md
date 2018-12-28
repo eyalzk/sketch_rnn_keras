@@ -74,6 +74,8 @@ The full list of configurable parameters:
 ```
 
 ### Using a trained model to draw
+![cat_interp](examples/cat_interp.svg)
+
 In the notebook `Skecth_RNN_Keras.ipynb` you can supply a path to a trained model and a dataset and explore what the model has learned.
 There are examples of encoding and decoding of sketches, interpulating in latent space, demonstrating sampling under different `temperature` values etc.
 
