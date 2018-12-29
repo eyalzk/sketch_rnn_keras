@@ -1,7 +1,12 @@
 # A Keras Implementation of Sketch-RNN
-In this repo there's a Kares implementation of the Sketch-RNN algorithm, as described in the paper [A Neural Representation of Sketch Drawings](https://arxiv.org/pdf/1704.03477.pdf) by David Ha and Douglas Eck (Google AI).
+<img align="right" style="float: right;" width="200" height="200" src="examples/guitar1.gif"> 
+
+In this repo there's a Kares implementation of the Sketch-RNN algorithm,   
+as described in the paper [A Neural Representation of Sketch Drawings](https://arxiv.org/pdf/1704.03477.pdf) by David Ha and Douglas Eck (Google AI).
+
 
 The implementation is ported from the [official Tensorflow implementation](https://github.com/tensorflow/magenta/tree/master/magenta/models/sketch_rnn) that was released under project [Magenta](https://magenta.tensorflow.org/) by the authors.
+
 
 ## Overview
 Sketch-RNN consists of a Sequence to Sequence Variational Autoencoder (Seq2SeqVAE), which is able to encode a series of pen strokes (a sketch) into a latent space, using a bidirectional LSTM as the encoder. The latent representation can then be decoded back into a series of strokes.  
@@ -15,6 +20,7 @@ I recommend David Ha's blog post [Teaching Machines to Draw](https://ai.googlebl
 
 ### Implementation Details
 You can find in this repo some useful solutions for common pitfalls when porting from TF to Keras (and writing Keras in general), for example:
+  * Injecting values to intermediate tensors and predicting the corresponding values of other tensors by building sub-models 
   * Using custom generators to wrap data loader classes
   * Using an auxiliary loss term that uses intermediate layers' outputs rather than the model's predictions
   * Using a CuDNN LSTM layer, while allowing inference on CPU
@@ -79,3 +85,5 @@ The full list of configurable parameters:
 In the notebook `Skecth_RNN_Keras.ipynb` you can supply a path to a trained model and a dataset and explore what the model has learned.
 There are examples of encoding and decoding of sketches, interpulating in latent space, sampling under different `temperature` values etc.
 
+#### References
+  - The guitar animation was created using [this tutorial](https://colab.research.google.com/github/zaidalyafeai/Notebooks/blob/master/Strokes_QuickDraw.ipynb)
