@@ -386,7 +386,6 @@ def sample(seq2seq_model, seq_len=250, temperature=1.0, greedy_mode=False, z=Non
         [o_pi, o_mu1, o_mu2, o_sigma1, o_sigma2, o_corr, o_pen, _] = mixture_params_val
 
 
-        # TODO: Currently this only sample of a randomly selected mixture each time. Why not sample from the GMM?
         idx = get_pi_idx(random.random(), o_pi[0][0], temperature, greedy_mode)
 
         idx_eos = get_pi_idx(random.random(), o_pen[0][0], temperature, greedy_mode)
@@ -407,9 +406,9 @@ def sample(seq2seq_model, seq_len=250, temperature=1.0, greedy_mode=False, z=Non
         mixture_params.append(params)
 
         prev_x = np.zeros((1, 1, 5), dtype=np.float32)
-        # todo: use strokes[i,:]?
-        prev_x[0][0] = np.array(
-            [next_x1, next_x2, eos[0], eos[1], eos[2]], dtype=np.float32)
+        prev_x[0][0] = np.array(strokes[i, :], dtype=np.float32)
+        # prev_x[0][0] = np.array(
+        #     [next_x1, next_x2, eos[0], eos[1], eos[2]], dtype=np.float32)
         prev_state = next_state
 
     return strokes, mixture_params
