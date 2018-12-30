@@ -83,7 +83,7 @@ The full list of configurable parameters:
 ![cat_interp](examples/cat_interp.svg)
 
 In the notebook `Skecth_RNN_Keras.ipynb` you can supply a path to a trained model and a dataset and explore what the model has learned.
-There are examples of encoding and decoding of sketches, interpulating in latent space, sampling under different `temperature` values etc.  
+There are examples of encoding and decoding of sketches, interpolating in latent space, sampling under different `temperature` values etc.  
 You can also load models trained on multiple data-sets and generate nifty interpolations such as these guitar-cats!
 ![guitar_cat_interp](examples/interp3.svg)
 
