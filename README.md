@@ -86,6 +86,7 @@ In the notebook `Skecth_RNN_Keras.ipynb` you can supply a path to a trained mode
 There are examples of encoding and decoding of sketches, interpolating in latent space, sampling under different `temperature` values etc.  
 You can also load models trained on multiple data-sets and generate nifty interpolations such as these guitar-cats!
 ![guitar_cat_interp](examples/interp3.svg)
+![guitar_cat_interp](examples/interp5.svg)
 
 #### References
   - The guitar animation was created using [this tutorial](https://colab.research.google.com/github/zaidalyafeai/Notebooks/blob/master/Strokes_QuickDraw.ipynb)
