@@ -1,0 +1,29 @@
+{
+ "accelerate_LSTM": false,
+ "kl_weight_start": 0.01,
+ "enc_rnn_size": 256,
+ "save_every": null,
+ "decay_rate": 0.9999,
+ "use_recurrent_dropout": true,
+ "augment_stroke_prob": 0.1,
+ "z_size": 128,
+ "kl_tolerance": 0.2,
+ "kl_weight": 0.5,
+ "dec_rnn_size": 1024,
+ "min_learning_rate": 1e-05,
+ "is_training": true,
+ "optimizer": "adam",
+ "batch_size": 100,
+ "learning_rate": 0.001,
+ "num_mixture": 20,
+ "recurrent_dropout_prob": 0.9,
+ "grad_clip": 1.0,
+ "random_scale_factor": 0.15,
+ "epochs": 100,
+ "kl_decay_rate": 0.99995,
+ "data_set": [
+  "cat.npz",
+  "guitar.npz"
+ ],
+ "max_seq_len": 129
+}
