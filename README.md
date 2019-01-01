@@ -88,5 +88,11 @@ You can also load models trained on multiple data-sets and generate nifty interp
 ![guitar_cat_interp](examples/interp3.svg)
 ![guitar_cat_interp](examples/interp5.svg)
 
+Examples in this notebook use models trained on my laptop's GPU:
+  * Cat model : 50 epochs
+  * Cat + Guitar model: 15 epochs
+
+Both pre trained models are included in this repo.
+
 #### References
   - The guitar animation was created using [this tutorial](https://colab.research.google.com/github/zaidalyafeai/Notebooks/blob/master/Strokes_QuickDraw.ipynb)
